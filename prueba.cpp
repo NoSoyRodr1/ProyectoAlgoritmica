@@ -343,7 +343,7 @@ void OpcsDCliente(UserManager& um, const string& username) {
                     cout << endl;
                 }
             }
-            cout << endl << endl << "Presione cualquier tecla para volver al menú..." << endl;
+            cout << endl << endl << "Presione cualquier tecla para volver al menu..." << endl;
             system("pause>nul");
         } else if (opt == "2") {
             // Realizar una reserva
