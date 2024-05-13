@@ -66,7 +66,8 @@ public:
     void registrarUsuario(const string &username, const string &password) {
         // Verificar si el usuario ya existe
         if (usuarioExiste(username)) {
-            cout << "Usuario ya existe." << endl;
+            cout << "\n\n\n\n\t\t\t\tUsuario ya existe." << endl;
+            cout<<"\t\t\tPulse cualquier tecla para regresar..."<< endl;
             return;
         }
         // Simulación de hash de contraseña
@@ -135,11 +136,10 @@ public:
 };
 
 // Lógica de las acciones que puede realizar el cliente
-void OpcsDCliente() 
-{
-    string opt;
-    do 
-    {   
+void OpcsDCliente() {
+    bool repite = true;
+    int opcion; //ahora el opcsdecliente esta en funcion switch,en cada opcion deberia hacer un subprograma que ha lo que se pide
+    do{   
         system("cls");
         cuadro(0,0,80,24);
         cuadro(1,1,77,3);
@@ -150,70 +150,56 @@ void OpcsDCliente()
         cout<<"\n\t3) Aumentar el plazo de estancia\n";
         cout<<"\n\t4) Retroceder al menu principal\n";
         cout<< "\n\tOpcion: ";
-        cin>>opt;
-
-        if (opt=="1") 
-        {
-            // Acciones
-            cout<<"...\n";
-        } 
-        else if (opt=="2") 
-        {
-            // Acciones
-            cout<<"...\n";
-        } 
-        else if (opt=="3") 
-        {
-            // Acciones
-            cout<<"...\n";
-        } 
-        else if (opt=="4") 
-        {
-            cout<<"\nVolviendo al menu principal...\n\n";
-            // Regresa al menú principal
-        } 
-        else 
-        {
-            cout<<"\nOpcion invalida.\n\n";
+        cin>>opcion;
+        switch(opcion){
+            case 1:
+                cout<<"...\n";
+                break;
+            case 2:
+                cout<<"...\n";
+                break;
+            case 3:
+                cout<<"...\n";
+                break;
+            case 4:
+                repite = false;
+                cout<<"\n\n\n\tTendra que volver a ingresar,pulse cualquier letra para continuar";
+                break;
         }
     } 
-    while (opt!="4");
+    while (repite);
 }
 
 // Lógica de las acciones que puede realizar el personal
-void OpcDPersonal() 
-{
-    string opt;
-    do 
-    {
+void OpcDPersonal() {
+    bool repite =true;  // lo mismo que el anterior,ahora esta en funcion switch y en cada case abria una opcion
+    int opcion;
+    do {
         system("cls");
-        cout<<"\n\t\t\tBienvenido, personal del hotel. Que accion desea realizar?:\n";
+        cuadro(0,0,80,24);
+        cuadro(1,1,77,3);
+        gotoxy(30,1);cout<<"\n\t\t\tBienvenido, personal del hotel. Que accion desea realizar?:\n";
+        gotoxy(2,4);
         cout<<"\n\t1) Realizar check-in\n";
         cout<<"\n\t2) Realizar check-out\n";
         cout<<"\n\t3) Retroceder al menu principal\n";
-        cin>>opt;
+        cin>>opcion;
 
-        if (opt=="1") 
-        {
-            // Acciones
-            cout<<"...\n";
-        } 
-        else if (opt=="2") 
-        {
-            // Acciones
-            cout<<"...\n";
-        } 
-        else if (opt=="3") 
-        {
-            cout<<"\nVolviendo al menu principal...\n\n";
-            // Regresa al menú principal
-        } 
-        else 
-        {
-            cout<<"\nOpcion invalida.\n\n";
-        }
-    } 
-    while (opt!="3");
+        switch(opcion){
+            case 1:
+                cout<<"...\n";
+            break;
+
+            case 2:
+                cout<<"...\n";
+            break;
+
+            case 3:
+                repite = false;
+                cout<<"\n\n\n\tTendra que volver a ingresar,pulse cualquier letra para continuar";
+                break;
+        }  
+    }while (repite);
 }
 
 // Función principal del programa
@@ -271,7 +257,7 @@ void menu_cliente(){
         cuadro(0,0,80,24);
         cuadro(1,1,77,3);
         // El título del menú
-        gotoxy(30,1);cout<<"\n\t\t\tMENU DEL CLIENTE\n";
+        gotoxy(30,1);cout<<"\n\t\t\t\tMENU DEL CLIENTE\n";
         gotoxy(2,4);
         cout<<"\n\t1) Iniciar Sesion\n";
         cout<<"\n\t2) Registrarse\n";
@@ -299,7 +285,7 @@ void menu_iniciarcliente(){
     string password;
     cuadro(0,0,80,24);
     cuadro(1,1,77,3);
-    gotoxy(30,1);cout << "\n\t\tINICIAR SESION\n";
+    gotoxy(30,1);cout << "\n\t\t\t\tINICIAR SESION\n";
     gotoxy(2,4);
     cout << "\n\tIngrese nombre de usuario: ";
     cin >> username;
@@ -309,7 +295,8 @@ void menu_iniciarcliente(){
         cout << "Inicio de sesion exitoso." << endl;
         OpcsDCliente(); // Mostrar opciones para el cliente
     } else {
-         cout << "Error de inicio de sesion." << endl;
+         cout << "\n\n\n\n\t\t\tError de inicio de sesion." << endl;
+         cout<<"\t\t\tPulse cualquier tecla para regresar..."<< endl;
     }
     system("pause>nul");
 
@@ -322,7 +309,7 @@ void menu_iniciarregistro(){
     string password;
     cuadro(0,0,80,24);
     cuadro(1,1,77,3);
-    gotoxy(30,1);cout << "\n\t\tREGISTRAR USUARIO:\n";
+    gotoxy(30,1);cout << "\n\t\t\t\tREGISTRAR USUARIO:\n";
     gotoxy(2,4);
     cout << "\n\tIngrese nombre de usuario: ";
     cin >> username;
@@ -341,7 +328,7 @@ void menu_personal(){
         // El título del menú
     cuadro(0,0,80,24);
     cuadro(1,1,77,3);
-    gotoxy(30,1);cout<<"\n\t\t\tMENU DEL PERSONAL\n";
+    gotoxy(30,1);cout<<"\n\t\t\t\tMENU DEL PERSONAL\n";
     gotoxy(2,4);
     cout << "\n\tIniciar sesion:\n";
     cout << "\n\tIngrese nombre de usuario: ";
@@ -352,7 +339,8 @@ void menu_personal(){
         cout << "\n\tInicio de sesion exitoso." << endl;
         OpcDPersonal(); // Mostrar opciones para el personal
     } else {
-        cout << "\n\tError de inicio de sesion." << endl;
+        cout << "\n\n\n\n\t\t\tError de inicio de sesion." << endl;
+        cout<<"\t\t\tPulse cualquier tecla para regresar..."<< endl;
     }
     system("pause>nul");
 }
