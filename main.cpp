@@ -27,6 +27,9 @@ void menu_iniciarcliente();
 void menu_iniciarregistro();
 void menu_personal();
 void menu_comida();
+void menu_desayuno();
+void menu_almuerzo();
+void menu_cena();
 void hacerReserva(const string& username);
 void verReservas();
 void cancelarReserva(const string& username);
@@ -118,7 +121,7 @@ public:
             } catch (const invalid_argument& e) {
                 cerr << "Error de formato en la línea: " << line << endl;
             } catch (const out_of_range& e) {
-                cerr << "Número fuera de rango en la línea: " << line << endl;
+                cerr << "Numero fuera de rango en la línea: " << line << endl;
             }
         }
         file.close();
@@ -236,7 +239,8 @@ public:
 
         system("cls");
         cuadro(0, 0, 80, 24);
-        gotoxy(30, 2); cout << "Hacer una reserva de cochera";
+        cuadro(1, 1, 77, 3);
+        gotoxy(30, 2); cout << "Hacer una reserva de cochera"<<endl;
         string cocheraId, fechaInicio, fechaFin;
 
         // Verificar si el usuario tiene saldo suficiente
@@ -248,7 +252,7 @@ public:
         }
 
         // Mostrar el saldo actual
-        cout << "Saldo actual del usuario '" << username << "': " << saldo << endl;
+        cout << "\n\tSaldo actual del usuario '" << username << "': " << saldo << endl;
 
         // Obtener el número de cochera
         gotoxy(2, 16); cout << "Ingrese el ID de la cochera: ";
@@ -307,15 +311,15 @@ public:
             guardarReservasCocheras();
 
             // Mostrar mensaje de reserva exitosa
-            cout << "\nReserva de cochera realizada con éxito.\n"
-                 << "Cochera ID: " << cocheraId << "\n"
-                 << "Desde " << fechaInicio << " hasta " << fechaFin << "\n"
-                 << "ID de la reserva: " << nextReservaId - 1 << "\n"
-                 << "Pulse enter para continuar...";
+            cout << "\n\tReserva de cochera realizada con éxito.\n"
+                 << "\tCochera ID: " << cocheraId << "\n"
+                 << "\tDesde " << fechaInicio << " hasta " << fechaFin << "\n"
+                 << "\tID de la reserva: " << nextReservaId - 1 << "\n"
+                 << "\tPulse enter para continuar...";
         } else {
             // La cochera no está disponible
-            cout << "\nCochera no disponible o ID inválido.\n"
-                 << "Pulse enter para continuar...";
+            cout << "\n\tCochera no disponible o ID inválido.\n"
+                 << "\tPulse enter para continuar...";
         }
         cin.ignore();
         cin.get();
@@ -548,30 +552,31 @@ public:
 
         system("cls");
         cuadro(0, 0, 80, 24);
-        gotoxy(30, 2); cout << "Hacer una reserva";
+        cuadro(1, 1, 77, 3);
+        gotoxy(30, 2); cout << "Hacer una reserva"<<endl;
         int habitacionId;
         string fechaInicio, fechaFin;
 
         // Verificar si el usuario tiene saldo suficiente
         if (saldo < 0.0) {
-            cout << "El usuario '" << username << "' no existe o tiene saldo negativo." << endl;
+            cout << " El usuario '" << username << "' no existe o tiene saldo negativo." << endl;
             cin.ignore();
             cin.get();
             return;
         }
 
         // Mostrar el saldo actual
-        cout << "Saldo actual del usuario '" << username << "': " << saldo << endl;
+        cout << "\n Saldo actual del usuario '" << username << "': " << saldo << endl;
 
         // Obtener el número de habitación
-        gotoxy(2, 16); cout << "Ingrese el número de la habitación: ";
+        gotoxy(2, 16); cout << "Ingrese el numero de la habitacion: ";
         cin >> habitacionId;
 
         // Obtener el precio de la habitación
         double precioHabitacion = obtenerPrecioHabitacion(habitacionId);
 
         if (precioHabitacion <= 0.0) {
-            cout << "\nHabitación no encontrada o precio no válido.\n";
+            cout << "\nHabitacion no encontrada o precio no valido.\n";
             cin.ignore();
             cin.get();
             return;
@@ -623,17 +628,13 @@ public:
             guardarReservas();
 
             // Mostrar mensaje de reserva exitosa
-            cout << "\nReserva realizada con éxito.\n"
-                 << "Habitación número " << habitacionId << " reservada a nombre del cliente " << username << "\n"
-                 << "Desde " << fechaInicio << " hasta " << fechaFin << "\n"
-                 << precioHabitacion << "\n" << diasEntreFechas(fechaInicio, fechaFin) << "\n"
-                 << saldo<< "\n"
-                 << "ID de la reserva: " << nextReservaId - 1 << "\n"
-                 << "Pulse enter para continuar...";
+            cout << "\n\tReserva realizada con exito.\n"
+                 << "\tHabitacion numero " << habitacionId << " reservada a nombre del cliente " << username << "\n"
+                 << "\tDesde " << fechaInicio << " hasta " << fechaFin << "\n\t"
+                 << "\tID de la reserva: " << nextReservaId - 1 ;
         } else {
             // La habitación no está disponible
-            cout << "\nHabitación no disponible o ID inválido.\n"
-                 << "Pulse enter para continuar...";
+            cout << "\nHabitacion no disponible o ID invalido.\n";
         }
         cin.ignore();
         cin.get();
@@ -641,6 +642,7 @@ public:
     void verReservasUsuario(const string& username) {
         system("cls");
         cuadro(0, 0, 80, 24);
+        cuadro(1, 1, 77, 3);        
         gotoxy(30, 2); cout << "Reservas del usuario: " << username;
         bool reservaEncontrada = false;
         int linea = 4;
@@ -652,8 +654,8 @@ public:
                     if (habitacion.id == reserva.habitacionId) {
                         // Mostramos los detalles de la reserva
                         gotoxy(2, linea++); cout << "ID de la reserva: " << reserva.id;
-                        gotoxy(2, linea++); cout << "Número de habitación: " << reserva.habitacionId;
-                        gotoxy(2, linea++); cout << "Tipo de habitación: " << habitacion.tipo;
+                        gotoxy(2, linea++); cout << "Numero de habitacion: " << reserva.habitacionId;
+                        gotoxy(2, linea++); cout << "Tipo de habitacion: " << habitacion.tipo;
                         gotoxy(2, linea++); cout << "Fecha de inicio: " << reserva.fechaInicio;
                         gotoxy(2, linea++); cout << "Fecha de fin: " << reserva.fechaFin;
                         gotoxy(2, linea++); cout << "-------------------------";
@@ -901,9 +903,9 @@ public:
 void OpcsDCliente(UserManager& um, const string& username) {
     int opt;
     bool repite=true;
-    char titulo[100];
-    sprintf(titulo, "\n\t\tBienvenido %s, que accion desea realizar?:\n\n", username.c_str());
-	const char *opciones[] = {"Ver habitaciones disponibles", "Ver sitios en cochera disponibles", "Reservar una habitación", "Reservar cochera","Pedir menu","Cancelar una reserva de habitación","Cancelar una reserva de cochera","Ver reservas hechas","Retroceder al menu principal"};
+    const char *titulo = "Bienvenido usuario que accion desea realizar";
+	const char *opciones[] = {"Ver habitaciones disponibles", "Ver sitios en cochera disponibles", "Reservar una habitacion",
+     "Reservar cochera","Pedir menu","Cancelar una reserva de habitacion","Cancelar una reserva de cochera","Ver reservas hechas","Retroceder al menu principal"};
     int m = 9;
     do {
         opt=menu(titulo, opciones ,m);
@@ -1000,6 +1002,186 @@ void menu_iniciarcliente() {
     }
 }
 
+void menu_desayuno(){
+    int opt;
+    bool repite=true;
+    const char *titulo = "Menu de Desayuno";
+	const char *opciones[] = {"Chicharron de cerdo 1/4", "Tamal con zarza","Pan con huevo y salchicha huachana",
+    "Tostada francesa","Cafe","Jugo de papaya","Capuccino","Jugo de fresa con leche","Regresar"};
+    int m=9;
+
+    do {
+        opt=menu(titulo,opciones,m);
+        switch(opt){
+            
+            case 1:
+                gotoxy(6,18);cout<<"Usted ha pedido un 1/4 de chicharron,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 2:
+                gotoxy(6,18);cout<<"Usted ha pedido un tamal con zarza,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 3:
+                gotoxy(6,18);cout<<"Usted ha pedido un pan con huevo y salchicha,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 4:
+                gotoxy(6,18);cout<<"Usted ha pedido una tostada francesa,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 5:
+                gotoxy(6,18);cout<<"Usted ha pedido un cafe,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 6:
+                gotoxy(6,18);cout<<"Usted ha pedido un jugo de papaya,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 7:
+                gotoxy(6,18);cout<<"Usted ha pedido un capuccino,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 8:
+                gotoxy(6,18);cout<<"Usted ha pedido un jugo de fresa con leche,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 9:
+                repite=false;         
+                break;
+        }
+    } while (repite);
+
+}
+void menu_cena(){
+    int opt;
+    bool repite=true;
+    const char *titulo = "Menu de Cena";
+	const char *opciones[] = {"Chicharron de cerdo 1/4", "Arroz con atun","Pan con huevo y salchicha huachana",
+    "Tostada francesa","Cafe","Jugo de papaya","Capuccino","Jugo de fresa con leche","Regresar"};
+    int m=9;
+
+    do {
+        opt=menu(titulo,opciones,m);
+        switch(opt){
+            case 1:
+                gotoxy(6,18);cout<<"Usted ha pedido un 1/4 de chicharron,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 2:
+                gotoxy(6,18);cout<<"Usted ha pedido un arroz con atun,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+
+                break;
+            case 3:
+                gotoxy(6,18);cout<<"Usted ha pedido un pan con huevo y salchicha,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+
+                break;
+            case 4:
+                gotoxy(6,18);cout<<"Usted ha pedido una tostada francesa,muchas gracias"<<endl;
+                system("pause");
+                repite=false;         
+                break;
+            case 5:
+                gotoxy(6,18);cout<<"Usted ha pedido un cafe,muchas gracias"<<endl;
+                system("pause");
+                repite=false;        
+                break;
+            case 6:
+                gotoxy(6,18);cout<<"Usted ha pedido un jugo de papaya,muchas gracias"<<endl;
+                system("pause");
+                repite=false;           
+                break;
+            case 7:
+                gotoxy(6,18);cout<<"Usted ha pedido un capuccino,muchas gracias"<<endl;
+                system("pause");
+                repite=false;      
+                break;
+            case 8:
+                gotoxy(6,18);cout<<"Usted ha pedido un jugo de fresa con leche,muchas gracias"<<endl;
+                 system("pause");
+                repite=false;      
+                break;
+            case 9:
+                repite=false;         
+                break;
+        }
+    } while (repite);
+
+}
+void menu_almuerzo(){
+    int opt;
+    bool repite=true;
+    const char *titulo = "Menu de Almuerzo";
+	const char *opciones[] = {"Arroz a la cubana", "Pechuga a la plancha","Pescado frito",
+    "Arroz con atun","Cafe","Chicha a litro","Capuccino","Maracuya","Regresar"};
+    int m=9;
+
+    do {
+        opt=menu(titulo,opciones,m);  
+        switch(opt){
+            case 1:
+                gotoxy(6,18);cout<<"Usted ha pedido un arroz a la cubana,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+                break;
+            case 2:
+                gotoxy(6,18);cout<<"Usted ha pedido una pechuga a la plancha,muchas gracias"<<endl;
+                system("pause");
+                repite=false;
+
+                break;
+            case 3:
+                gotoxy(6,18);cout<<"Usted ha pedido un pescado frito,muchas gracias"<<endl;
+                system("pause");
+                repite=false; 
+
+                break;
+            case 4:
+                gotoxy(6,18);cout<<"Usted ha pedido un arroz con atun,muchas gracias"<<endl;
+                system("pause");
+                repite=false;           
+                break;
+            case 5:
+                gotoxy(6,18);cout<<"Usted ha pedido un cafe,muchas gracias"<<endl;         
+                system("pause");
+                repite=false;                
+                break;
+            case 6:
+                gotoxy(6,18);cout<<"Usted ha pedido una chicha a litro,muchas gracias"<<endl;
+                system("pause");
+                repite=false;          
+                break;
+            case 7:
+                gotoxy(6,18);cout<<"Usted ha pedido un capuccino,muchas gracias"<<endl;    
+                system("pause");
+                repite=false;       
+                break;
+            case 8:
+                gotoxy(6,18);cout<<"Usted ha pedido una maracuya,muchas gracias"<<endl;
+                system("pause");
+                repite=false;           
+                break;
+            case 9:
+                repite=false;         
+                break;
+        }
+    } while (repite);
+
+
+}
 void menu_comida() {
     int opt;
     bool repite=true;
@@ -1010,19 +1192,13 @@ void menu_comida() {
         opt=menu(titulo, opciones ,m);
         switch(opt){
             case 1:
-                cout << "\nDesayuno pedido.\nPulse enter para continuar...";
-                cin.ignore();
-                cin.get();
+                menu_desayuno();
                 break;
             case 2:
-            cout << "\nAlmuerzo pedido.\nPulse enter para continuar...";
-            cin.ignore();
-            cin.get();
+                menu_almuerzo();
                 break;
             case 3:
-            cout << "\nCena pedida.\nPulse enter para continuar...";
-            cin.ignore();
-            cin.get();
+                menu_cena();
                 break;
             case 4:
                 repite=false;
