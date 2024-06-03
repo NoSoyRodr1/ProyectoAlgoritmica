@@ -119,9 +119,9 @@ public:
                 mon = stod(monStr); // Convertir string a double
                 usuarios.push_back({usr, pwd, mon});
             } catch (const invalid_argument& e) {
-                cerr << "Error de formato en la línea: " << line << endl;
+                cerr << "Error de formato en la linea: " << line << endl;
             } catch (const out_of_range& e) {
-                cerr << "Numero fuera de rango en la línea: " << line << endl;
+                cerr << "Numero fuera de rango en la linea: " << line << endl;
             }
         }
         file.close();
@@ -280,7 +280,7 @@ public:
         gotoxy(2, 18); cout << "Fecha de fin (DD/MM/YYYY): ";
         cin >> fechaFin;
         if (!esFechaValida(fechaFin)) {
-            cout << "\nFecha de fin no válida.\n";
+            cout << "\nFecha de fin no valida.\n";
             cin.ignore();
             cin.get();
             return;
@@ -311,14 +311,14 @@ public:
             guardarReservasCocheras();
 
             // Mostrar mensaje de reserva exitosa
-            cout << "\n\tReserva de cochera realizada con éxito.\n"
+            cout << "\n\tReserva de cochera realizada con exito.\n"
                  << "\tCochera ID: " << cocheraId << "\n"
                  << "\tDesde " << fechaInicio << " hasta " << fechaFin << "\n"
                  << "\tID de la reserva: " << nextReservaId - 1 << "\n"
                  << "\tPulse enter para continuar...";
         } else {
             // La cochera no está disponible
-            cout << "\n\tCochera no disponible o ID inválido.\n"
+            cout << "\n\tCochera no disponible o ID invalido.\n"
                  << "\tPulse enter para continuar...";
         }
         cin.ignore();
@@ -588,7 +588,7 @@ public:
         gotoxy(2, 17); cout << "Fecha de inicio (DD/MM/YYYY): ";
         cin >> fechaInicio;
         if (!esFechaValida(fechaInicio)) {
-            cout << "\nFecha de inicio no válida.\n";
+            cout << "\nFecha de inicio no valida.\n";
             cin.ignore();
             cin.get();
             return;
@@ -596,7 +596,7 @@ public:
         gotoxy(2, 18); cout << "Fecha de fin (DD/MM/YYYY): ";
         cin >> fechaFin;
         if (!esFechaValida(fechaFin)) {
-            cout << "\nFecha de fin no válida.\n";
+            cout << "\nFecha de fin no valida.\n";
             cin.ignore();
             cin.get();
             return;
@@ -665,7 +665,7 @@ public:
             }
         }
         if (!reservaEncontrada) {
-            gotoxy(2, 4); cout << "\nNo tiene una reserva hecha en este momento.";
+            gotoxy(2, 4); cout << "No tiene una reserva hecha en este momento.";
         }
         gotoxy(2, linea); cout << "\nPulse enter para continuar...";
         cin.ignore();
@@ -724,9 +724,9 @@ public:
             reservas.erase(it);
             guardarReservas(); // Guardar las reservas actualizadas
 
-            cout << "\nReserva cancelada con éxito. Reembolso realizado.\n";
+            cout << "\nReserva cancelada con exito. Reembolso realizado.\n";
         } else {
-            cout << "\nID de reserva inválido o no pertenece al usuario.\n";
+            cout << "\nID de reserva invalido o no pertenece al usuario.\n";
         }
 
         cout << "Pulse enter para continuar...";
@@ -770,9 +770,9 @@ public:
             reservasCocheras.erase(it);
             guardarReservasCocheras(); // Guardar las reservas actualizadas
 
-            cout << "\nReserva de cochera cancelada con éxito. Reembolso realizado.\n";
+            cout << "\nReserva de cochera cancelada con exito. Reembolso realizado.\n";
         } else {
-            cout << "\nID de reserva inválido o no pertenece al usuario.\n";
+            cout << "\nID de reserva invalido o no pertenece al usuario.\n";
         }
 
         cout << "Pulse enter para continuar...";
