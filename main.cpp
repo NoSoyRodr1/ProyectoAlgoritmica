@@ -20,7 +20,6 @@ void menu_iniciarregistro();
 void menu_personal();
 void menu_comida();
 void hacerReserva(const string& username);
-void verReservasUsuario(const string& username);
 void verReservas();
 void cancelarReserva(const string& username);
 void mostrarHabitacionesDisponiblesPorTipo(const string& tipo);
@@ -244,84 +243,45 @@ bool esFechaValida(const string& fecha) {
         file.close();
     }
 
-   void hacerReserva(const string& username) {
-    system("cls");
-    cuadro(0, 0, 80, 24);
-    gotoxy(30, 2); cout << "Hacer una reserva";
-    int habitacionId;
-    string fechaInicio, fechaFin;
-    gotoxy(2, 16); cout << "Ingrese el número de la habitación: ";
-    cin >> habitacionId;
-    gotoxy(2, 17); cout << "Fecha de inicio (DD/MM/YYYY): ";
-    cin >> fechaInicio;
-    if (!esFechaValida(fechaInicio)) {
-        cout << "\nFecha de inicio no válida.\nPulse enter para continuar...";
-        cin.ignore();
-        cin.get();
-        return;
-    }
-    gotoxy(2, 18); cout << "Fecha de fin (DD/MM/YYYY): ";
-    cin >> fechaFin;
-    if (!esFechaValida(fechaFin)) {
-        cout << "\nFecha de fin no válida.\nPulse enter para continuar...";
-        cin.ignore();
-        cin.get();
-        return;
-    }
-    auto it = find_if(habitaciones.begin(), habitaciones.end(), [&](const Habitacion& h){
-        return h.id == habitacionId && h.disponible;
-    });
-    if (it != habitaciones.end()) {
-        it->disponible = false;
-        // Usamos nextReservaId para el ID de la nueva reserva y luego lo incrementamos
-        reservas.push_back({nextReservaId++, username, habitacionId, fechaInicio, fechaFin});
-        guardarHabitaciones();
-        guardarReservas();
-        cout << "\nReserva realizada con éxito.\nHabitación número " << habitacionId << " reservada a nombre del cliente " << username << " desde " << fechaInicio << " hasta " << fechaFin << "\nID de la reserva: " << nextReservaId - 1 << " \nPulse enter para continuar...";
-    } else {
-        cout << "\nHabitación no disponible o ID inválido.\nPulse enter para continuar...";
-    }
-    cin.ignore();
-    cin.get();
-}
- void verReservasUsuario(const string& username) {
-    system("cls");
-    cuadro(0, 0, 80, 24);
-    gotoxy(30, 2); cout << "Reservas del usuario: " << username;
-    
-    bool reservaEncontrada = false;
-    int linea = 4;
-    // Recorremos todas las reservas
-    for (const auto& reserva : reservas) {
-        if (reserva.username == username) {
-            // Buscamos la habitación correspondiente a la reserva
-            for (const auto& habitacion : habitaciones) {
-                if (habitacion.id == reserva.habitacionId) {
-                    // Mostramos los detalles de la reserva
-                    gotoxy(2, linea++); cout << "ID de la reserva: " << reserva.id;
-                    gotoxy(2, linea++); cout << "Número de habitación: " << reserva.habitacionId;
-                    gotoxy(2, linea++); cout << "Tipo de habitación: " << habitacion.tipo;
-                    gotoxy(2, linea++); cout << "Fecha de inicio: " << reserva.fechaInicio;
-                    gotoxy(2, linea++); cout << "Fecha de fin: " << reserva.fechaFin;
-                    gotoxy(2, linea++); cout << "-------------------------";
-                    reservaEncontrada = true;
-                }
-            }
+    void hacerReserva(const string& username) {
+        system("cls");
+        cuadro(0, 0, 80, 24);
+        gotoxy(30, 2); cout << "Hacer una reserva";
+        int habitacionId;
+        string fechaInicio, fechaFin;
+        gotoxy(2, 16); cout << "Ingrese el número de la habitación: ";
+        cin >> habitacionId;
+        gotoxy(2, 17); cout << "Fecha de inicio (DD/MM/YYYY): ";
+        cin >> fechaInicio;
+        if (!esFechaValida(fechaInicio)) {
+            cout << "\nFecha de inicio no válida.\nPulse enter para continuar...";
+            cin.ignore();
+            cin.get();
+            return;
         }
+        gotoxy(2, 18); cout << "Fecha de fin (DD/MM/YYYY): ";
+        cin >> fechaFin;
+        if (!esFechaValida(fechaFin)) {
+            cout << "\nFecha de fin no válida.\nPulse enter para continuar...";
+            cin.ignore();
+            cin.get();
+            return;
+        }
+        auto it = find_if(habitaciones.begin(), habitaciones.end(), [&](const Habitacion& h) {
+            return h.id == habitacionId && h.disponible;
+        });
+        if (it != habitaciones.end()) {
+            it->disponible = false;
+            reservas.push_back({nextReservaId++, username, habitacionId, fechaInicio, fechaFin});
+            guardarHabitaciones();
+            guardarReservas();
+            cout << "\nReserva realizada con éxito.\nHabitación número " << habitacionId << " reservada a nombre del cliente " << username << " desde " << fechaInicio << " hasta " << fechaFin << "\nID de la reserva: " << nextReservaId - 1 << " \nPulse enter para continuar...";
+        } else {
+            cout << "\nHabitación no disponible o ID inválido.\nPulse enter para continuar...";
+        }
+        cin.ignore();
+        cin.get();
     }
-    if (!reservaEncontrada) {
-        gotoxy(2, 4); cout << "No tiene una reserva hecha en este momento.";
-    }
-    gotoxy(2, linea); cout << "Pulse enter para continuar...";
-    cin.ignore();
-    cin.get();
-
-    // Regresamos a la función anterior
-    return;
-}
-
-
-
 
     void verReservas() {
         system("cls");
@@ -424,8 +384,7 @@ void OpcsDCliente(UserManager& um, const string& username) {
         gotoxy(2, 5); cout << "2) Hacer una reserva";
         gotoxy(2, 6); cout << "3) Pedir menú";
         gotoxy(2, 7); cout << "4) Cancelar una reserva";
-        gotoxy(2, 8); cout << "5) Ver reserva hecha";
-        gotoxy(2, 9); cout << "6) Retroceder al menú principal";
+        gotoxy(2, 8); cout << "5) Retroceder al menú principal";
         gotoxy(2, 10); cout << "Opción: ";
         cin >> opt;
 
@@ -437,11 +396,8 @@ void OpcsDCliente(UserManager& um, const string& username) {
             menu_comida();
         } else if (opt == "4") {
             um.cancelarReserva(username);
-        } else if (opt == "5") {
-            um.verReservasUsuario(username);
         }
-
-    } while (opt != "6");
+    } while (opt != "5");
 }
 
 // Función para el menú del cliente previo inicio sesión
