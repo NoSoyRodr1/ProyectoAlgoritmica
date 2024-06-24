@@ -8,25 +8,34 @@
 #include <windows.h>
 #include <set>
 #include <ctime>
+#include<conio.h>
+#include<stdio.h>
+#include<stdlib.h>
+#define TECLA_ARRIBA 72
+#define TECLA_ABAJO 80
+#define ENTER 13
 using namespace std;
 
 // Declaraciones de funciones
 void gotoxy(int x, int y);
 void cuadro(int x1, int y1, int x2, int y2);
+int menu(const char *titulo, const char *opciones[],int m); //Con este menu ya no sera necesario poner el titulo y sub mas dificil
 void menuprincipal();
 void menu_cliente();
+void menuingresopersonal();
 void menu_iniciarcliente();
 void menu_iniciarregistro();
 void menu_personal();
 void menu_comida();
 void hacerReserva(const string& username);
-void verReservasUsuario(const string& username);
 void verReservas();
 void cancelarReserva(const string& username);
 void mostrarHabitacionesDisponiblesPorTipo(const string& tipo);
 bool esFechaValida(const string& fecha);
 
-// Estructuras para representar usuario, usuario del personal, habitación y reserva
+
+
+// Estructuras para representar usuario, usuario del personal, habitaciÃ³n y reserva
 struct Usuario {
     string username;
     string password_hash;
@@ -52,7 +61,7 @@ struct Reserva {
     string fechaFin;
 };
 
-// Clase para manejar la gestión de usuarios
+// Clase para manejar la gestiÃ³n de usuarios
 class UserManager {
 private:
     vector<Usuario> usuarios;
@@ -95,7 +104,7 @@ bool esFechaValida(const string& fecha) {
     if (fecha.size() != 10 || fecha[2] != '/' || fecha[5] != '/') {
         return false;
     }
-    // Extraer día, mes y año
+    // Extraer dÃ­a, mes y aÃ±o
     stringstream ss(fecha);
     int dia, mes, anio;
     char delim;
@@ -104,20 +113,20 @@ bool esFechaValida(const string& fecha) {
     if (ss.fail()) {
         return false;
     }
-    // Verificar si el año es válido
+    // Verificar si el aÃ±o es vÃ¡lido
     if (anio < 2023) {
         return false;
     }
-    // Verificar si el mes es válido
+    // Verificar si el mes es vÃ¡lido
     if (mes < 1 || mes > 12) {
         return false;
     }
-    // Verificar los días dependiendo del mes y si es año bisiesto o no
+    // Verificar los dÃ­as dependiendo del mes y si es aÃ±o bisiesto o no
     int diasEnMes[] = {31, 28 + (anio % 4 == 0 && (anio % 100 != 0 || anio % 400 == 0)), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (dia < 1 || dia > diasEnMes[mes - 1]) {
         return false;
     }
-    // Si pasa todas las verificaciones, es una fecha válida
+    // Si pasa todas las verificaciones, es una fecha vÃ¡lida
     return true;
 }
 
@@ -244,47 +253,46 @@ bool esFechaValida(const string& fecha) {
         file.close();
     }
 
-   void hacerReserva(const string& username) {
-    system("cls");
-    cuadro(0, 0, 80, 24);
-    gotoxy(30, 2); cout << "Hacer una reserva";
-    int habitacionId;
-    string fechaInicio, fechaFin;
-    gotoxy(2, 16); cout << "Ingrese el número de la habitación: ";
-    cin >> habitacionId;
-    gotoxy(2, 17); cout << "Fecha de inicio (DD/MM/YYYY): ";
-    cin >> fechaInicio;
-    if (!esFechaValida(fechaInicio)) {
-        cout << "\nFecha de inicio no válida.\nPulse enter para continuar...";
+    void hacerReserva(const string& username) {
+        system("cls");
+        cuadro(0, 0, 80, 24);
+        gotoxy(30, 2); cout << "Hacer una reserva";
+        int habitacionId;
+        string fechaInicio, fechaFin;
+        gotoxy(2, 16); cout << "Ingrese el numero de la habitacion: ";
+        cin >> habitacionId;
+        gotoxy(2, 17); cout << "Fecha de inicio (DD/MM/YYYY): ";
+        cin >> fechaInicio;
+        if (!esFechaValida(fechaInicio)) {
+            cout << "\nFecha de inicio no valida.\nPulse enter para continuar...";
+            cin.ignore();
+            cin.get();
+            return;
+        }
+        gotoxy(2, 18); cout << "Fecha de fin (DD/MM/YYYY): ";
+        cin >> fechaFin;
+        if (!esFechaValida(fechaFin)) {
+            cout << "\nFecha de fin no valida.\nPulse enter para continuar...";
+            cin.ignore();
+            cin.get();
+            return;
+        }
+        auto it = find_if(habitaciones.begin(), habitaciones.end(), [&](const Habitacion& h) {
+            return h.id == habitacionId && h.disponible;
+        });
+        if (it != habitaciones.end()) {
+            it->disponible = false;
+            reservas.push_back({nextReservaId++, username, habitacionId, fechaInicio, fechaFin});
+            guardarHabitaciones();
+            guardarReservas();
+            cout << "\n\tReserva realizada con exito.\n\tHabitacion numero " << habitacionId << " reservada a nombre del cliente " << username << " \n\tdesde " << fechaInicio << " hasta " << fechaFin << "\n\tID de la reserva: " << nextReservaId - 1 << " \n\tPulse enter para continuar...";
+        } else {
+            cout << "\n\tHabitacion no disponible o ID invalido.\n\tPulse enter para continuar...";
+        }
         cin.ignore();
         cin.get();
-        return;
     }
-    gotoxy(2, 18); cout << "Fecha de fin (DD/MM/YYYY): ";
-    cin >> fechaFin;
-    if (!esFechaValida(fechaFin)) {
-        cout << "\nFecha de fin no válida.\nPulse enter para continuar...";
-        cin.ignore();
-        cin.get();
-        return;
-    }
-    auto it = find_if(habitaciones.begin(), habitaciones.end(), [&](const Habitacion& h){
-        return h.id == habitacionId && h.disponible;
-    });
-    if (it != habitaciones.end()) {
-        it->disponible = false;
-        // Usamos nextReservaId para el ID de la nueva reserva y luego lo incrementamos
-        reservas.push_back({nextReservaId++, username, habitacionId, fechaInicio, fechaFin});
-        guardarHabitaciones();
-        guardarReservas();
-        cout << "\nReserva realizada con éxito.\nHabitación número " << habitacionId << " reservada a nombre del cliente " << username << " desde " << fechaInicio << " hasta " << fechaFin << "\nID de la reserva: " << nextReservaId - 1 << " \nPulse enter para continuar...";
-    } else {
-        cout << "\nHabitación no disponible o ID inválido.\nPulse enter para continuar...";
-    }
-    cin.ignore();
-    cin.get();
-}
- void verReservasUsuario(const string& username) {
+     void verReservasUsuario(const string& username) {
     system("cls");
     cuadro(0, 0, 80, 24);
     gotoxy(30, 2); cout << "Reservas del usuario: " << username;
@@ -310,9 +318,9 @@ bool esFechaValida(const string& fecha) {
         }
     }
     if (!reservaEncontrada) {
-        gotoxy(2, 4); cout << "No tiene una reserva hecha en este momento.";
+        gotoxy(2, 4); cout << "\nNo tiene una reserva hecha en este momento.";
     }
-    gotoxy(2, linea); cout << "Pulse enter para continuar...";
+    gotoxy(2, linea); cout << "\nPulse enter para continuar...";
     cin.ignore();
     cin.get();
 
@@ -320,19 +328,17 @@ bool esFechaValida(const string& fecha) {
     return;
 }
 
-
-
-
     void verReservas() {
         system("cls");
         cuadro(0, 0, 80, 24);
+        cuadro(1, 1, 77, 3);
         gotoxy(30, 2); cout << "Reservas";
-        int y = 4;
+        int y = 2;
         for (const auto& r : reservas) {
-            gotoxy(2, y++);
-            cout << "ID Reserva: " << r.id << ", Usuario: " << r.username << ", ID Habitación: " << r.habitacionId << ", Fecha Inicio: " << r.fechaInicio << ", Fecha Fin: " << r.fechaFin;
+            gotoxy(2, y+=2);
+            cout << "ID Reserva: " << r.id << ", Usuario: " << r.username << ", ID Habitacion: " << r.habitacionId << ", \n\tFecha Inicio: " << r.fechaInicio << ", Fecha Fin: " << r.fechaFin;
         }
-        cout << "\nPulse enter para continuar...";
+        cout << "\n\tPulse enter para continuar...";
         cin.ignore();
         cin.get();
     }
@@ -340,6 +346,7 @@ bool esFechaValida(const string& fecha) {
     void cancelarReserva(const string& username) {
         system("cls");
         cuadro(0, 0, 80, 24);
+        cuadro(1, 1, 77, 3);
         gotoxy(30, 2); cout << "Cancelar Reserva";
         int reservaId;
         gotoxy(2, 4); cout << "Ingrese el ID de la reserva: ";
@@ -361,37 +368,39 @@ bool esFechaValida(const string& fecha) {
             reservas.erase(it);
             guardarHabitaciones();
             guardarReservas();
-            cout << "\nReserva cancelada con éxito.\nPulse enter para continuar...";
+            cout << "\nReserva cancelada con exito.\nPulse enter para continuar...";
         } else {
-            cout << "\nID de reserva inválido o no pertenece al usuario.\nPulse enter para continuar...";
+            cout << "\nID de reserva invalido o no pertenece al usuario.\nPulse enter para continuar...";
         }
 
         cin.ignore();
         cin.get();
     }
 
-    // Función para mostrar las habitaciones disponibles por tipo
+    // FunciÃ³n para mostrar las habitaciones disponibles por tipo
     void mostrarHabitacionesDisponiblesPorTipo(const string& tipo) {
         system("cls");
         cuadro(0, 0, 80, 24);
-        gotoxy(30, 1); cout << "Habitaciones Disponibles - Tipo: " << tipo;
+        cuadro(1, 1, 77, 3);
+        gotoxy(20, 2); cout << "Habitaciones Disponibles - Tipo: " << tipo;
         int y = 4;
         for (const auto& hab : habitaciones) {
             if (hab.tipo == tipo && hab.disponible) {
                 gotoxy(2, y++);
-                cout << "Número: " << hab.id << ", Precio: " << hab.precio;
+                cout << "Numero: " << hab.id << ", Precio: " << hab.precio;
             }
         }
-        cout << "\n\n\t\t\tPulse enter para continuar...";
+        cout << "\n\t\t\tPulse enter para continuar...";
         cin.ignore();
         cin.get();
     }
 
-    // Función para mostrar los tipos de habitaciones disponibles
+    // FunciÃ³n para mostrar los tipos de habitaciones disponibles
     void mostrarTiposDeHabitaciones() {
         system("cls");
         cuadro(0, 0, 80, 24);
-        gotoxy(30, 1); cout << "Seleccionar Tipo de Habitacion";
+        cuadro(1, 1, 77, 3);
+        gotoxy(30, 2); cout << "Seleccionar Tipo de Habitacion";
         set<string> tipos;
         for (const auto& hab : habitaciones) {
             tipos.insert(hab.tipo);
@@ -412,67 +421,100 @@ bool esFechaValida(const string& fecha) {
     }
 };
 
-// Funciones para el menú del cliente iniciado sesion
+// Funciones para el menÃº del cliente iniciado sesion
 void OpcsDCliente(UserManager& um, const string& username) {
-    string opt;
+    int opt;
+    bool repite=true;
+    const char *titulo = "Que accion desea realizar";
+	const char *opciones[] = {"Ver habitaciones disponibles", "Hacer una reserva","Pedir menu","Cancelar una reserva","Ver reservas hechas","Retroceder al menu principal"};
+    int m=6;
     do {
-        system("cls");
+        opt=menu(titulo, opciones ,m); //Lo que esta debajo de verde era la antigua forma de poner el menu ya no sera necesario eso
+        //Ahora bastara con agregar al arreglo de arriba(opciones),colocar tu opcion y agregarle +1 al m por cada opcion nueva
+        //Lo unico que se tendria que hacer es agregar su nueva funcion al switch,recordar que el retroceder tiene que ser el ultimo
+
+
+        /*system("cls");
         cuadro(0, 0, 80, 24);
         cuadro(1, 1, 77, 3);
-        gotoxy(30, 2); cout << "Bienvenido " << username << " Que accion desea realizar";
+        gotoxy(20, 2); cout << "Bienvenido " << username << " Que accion desea realizar";
         gotoxy(2, 4); cout << "1) Ver habitaciones disponibles";
         gotoxy(2, 5); cout << "2) Hacer una reserva";
-        gotoxy(2, 6); cout << "3) Pedir menú";
+        gotoxy(2, 6); cout << "3) Pedir menu";
         gotoxy(2, 7); cout << "4) Cancelar una reserva";
-        gotoxy(2, 8); cout << "5) Ver reserva hecha";
-        gotoxy(2, 9); cout << "6) Retroceder al menú principal";
-        gotoxy(2, 10); cout << "Opción: ";
-        cin >> opt;
+        gotoxy(2, 8); cout << "5) Ver reservas hecha";
+        gotoxy(2, 9); cout << "6) Retroceder al menu principal";
+        gotoxy(2, 10); cout << "Opcion: ";
+        cin >> opt;*/
+        switch(opt){
+            case 1:
 
-        if (opt == "1") {
-            um.mostrarTiposDeHabitaciones();
-        } else if (opt == "2") {
-            um.hacerReserva(username);
-        } else if (opt == "3") {
-            menu_comida();
-        } else if (opt == "4") {
-            um.cancelarReserva(username);
-        } else if (opt == "5") {
-            um.verReservasUsuario(username);
+                um.mostrarTiposDeHabitaciones();
+                break;
+            case 2:
+                um.hacerReserva(username);
+                break;
+            case 3:
+                menu_comida();
+                break;
+            case 4:
+                um.cancelarReserva(username);
+                break;
+            case 5:
+                um.verReservasUsuario(username);
+                break;
+            case 6:
+                repite=false;
+                break;
         }
-
-    } while (opt != "6");
+    } while (repite);
 }
 
-// Función para el menú del cliente previo inicio sesión
+// FunciÃ³n para el menÃº del cliente previo inicio sesiÃ³n
 void menu_cliente() {
     UserManager um;
-    string opt;
+    bool repite=true;
+    int opt;
+    const char *titulo = "Bienvenido al Hotel C++";
+	const char *opciones[] = {"Iniciar sesion", "Registrarse","Retroceder al menu principal"};
+    int m=3;
     do {
-        system("cls");
+        opt=menu(titulo, opciones ,m);//Lo que esta debajo de verde era la antigua forma de poner el menu ya no sera necesario eso
+        //Ahora bastara con agregar al arreglo de arriba(opciones),colocar tu opcion y agregarle +1 al m por cada opcion nueva
+        //Lo unico que se tendria que hacer es agregar su nueva funcion al switch,recordar que el retroceder tiene que ser el ultimo
+
+
+        /*system("cls");
         cuadro(0, 0, 80, 24);
         cuadro(1, 1, 77, 3);
-        gotoxy(30, 1); cout << "Bienvenido al hotel C++";
+        gotoxy(30, 2); cout << "Bienvenido al hotel C++";
         gotoxy(2, 4); cout << "1) Iniciar sesion" << endl;
         gotoxy(2, 5); cout << "2) Registrarse" << endl;
         gotoxy(2, 6); cout << "3) Retroceder al menu principal" << endl;
         gotoxy(2, 8); cout << "Opcion: ";
-        cin >> opt;
+        cin >> opt;*/
 
-        if (opt == "1") {
-            menu_iniciarcliente();
-        } else if (opt == "2") {
-            menu_iniciarregistro();
+        switch(opt){
+            case 1:
+                menu_iniciarcliente();
+                break;
+            case 2:
+                menu_iniciarregistro();
+                break;
+            case 3:
+                repite=false;
+                break;
         }
-    } while (opt != "3");
+    } while (repite);
 }
 
-// Función para el menú de inicio de registro
+// FunciÃ³n para el menÃº de inicio de registro
 void menu_iniciarregistro() {
     UserManager um;
     system("cls");
     cuadro(0, 0, 80, 24);
-    gotoxy(30, 1); cout << "Registro de usuario nuevo";
+    cuadro(1, 1, 77, 3);
+    gotoxy(30, 2); cout << "Registro de usuario nuevo";
     string username, password;
     cout << "\n\n\n\n\t\t\t\tUsername: ";
     cin >> username;
@@ -481,12 +523,13 @@ void menu_iniciarregistro() {
     um.registrarUsuario(username, password);
 }
 
-// Función para el menú de inicio de cliente
+// FunciÃ³n para el menÃº de inicio de cliente
 void menu_iniciarcliente() {
     UserManager um;
     system("cls");
     cuadro(0, 0, 80, 24);
-    gotoxy(30, 1); cout << "Inicio de sesion de cliente";
+    cuadro(1, 1, 77, 3);
+    gotoxy(30, 2); cout << "Inicio de sesion de cliente";
     string username, password;
     cout << "\n\n\n\n\t\t\t\tUsername: ";
     cin >> username;
@@ -503,96 +546,150 @@ void menu_iniciarcliente() {
 }
 
 void menu_comida() {
-    string opt;
+    int opt;
+    bool repite=true;
+    const char *titulo = "Menu de Comida";
+	const char *opciones[] = {"Pedir desayuno", "Pedir almuerzo","Pedir cena","Retroceder"};
+    int m=4;
     do {
+        opt=menu(titulo, opciones ,m);//Lo que esta debajo de verde era la antigua forma de poner el menu ya no sera necesario eso
+        //Ahora bastara con agregar al arreglo de arriba(opciones),colocar tu opcion y agregarle +1 al m por cada opcion nueva
+        //Lo unico que se tendria que hacer es agregar su nueva funcion al switch,recordar que el retroceder tiene que ser el ultimo
+
+        /*
         system("cls");
         cuadro(0, 0, 80, 24);
         cuadro(1, 1, 77, 3);
-        gotoxy(30, 1); cout << "Menu de Comida";
+        gotoxy(30, 2); cout << "Menu de Comida";
         gotoxy(2, 4); cout << "1) Pedir desayuno" << endl;
         gotoxy(2, 5); cout << "2) Pedir almuerzo" << endl;
         gotoxy(2, 6); cout << "3) Pedir cena" << endl;
         gotoxy(2, 7); cout << "4) Retroceder" << endl;
         gotoxy(2, 8); cout << "Opcion: ";
-        cin >> opt;
-        if (opt == "1") {
-            cout << "\nDesayuno pedido.\nPulse enter para continuar...";
-            cin.ignore();
-            cin.get();
-        } else if (opt == "2") {
+        cin >> opt;*/
+        switch(opt){
+            case 1:
+                cout << "\nDesayuno pedido.\nPulse enter para continuar...";
+                cin.ignore();
+                cin.get();
+                break;
+            case 2:
             cout << "\nAlmuerzo pedido.\nPulse enter para continuar...";
             cin.ignore();
             cin.get();
-        } else if (opt == "3") {
+                break;
+            case 3:
             cout << "\nCena pedida.\nPulse enter para continuar...";
             cin.ignore();
             cin.get();
+                break;
+            case 4:
+                repite=false;
+                break;
         }
-    } while (opt != "4");
+        /*if (opt == 1) {
+            cout << "\nDesayuno pedido.\nPulse enter para continuar...";
+            cin.ignore();
+            cin.get();
+        } else if (opt == 2) {
+            cout << "\nAlmuerzo pedido.\nPulse enter para continuar...";
+            cin.ignore();
+            cin.get();
+        } else if (opt == 3) {
+            cout << "\nCena pedida.\nPulse enter para continuar...";
+            cin.ignore();
+            cin.get();
+        }*/
+    } while (repite);
 }
 
 void menu_personal() {
     UserManager um;
-    string opt;
+    int opt;
+    const char *titulo = "Menu del personal";
+	const char *opciones[] = {"Ver reservas", "Ver habitaciones disponibles","Retroceder al menu principal"};
+    int m=3;    
     do {
-        system("cls");
+        opt=menu(titulo, opciones ,m);
+        /*system("cls");
         cuadro(0, 0, 80, 24);
         cuadro(1, 1, 77, 3);
-        gotoxy(30, 1); cout << "Menu del personal";
+        gotoxy(30, 2); cout << "Menu del personal";
         gotoxy(2, 4); cout << "1) Ver reservas" << endl;
         gotoxy(2, 5); cout << "2) Ver habitaciones disponibles" << endl;
         gotoxy(2, 6); cout << "3) Retroceder al menu principal" << endl;
         gotoxy(2, 8); cout << "Opcion: ";
-        cin >> opt;
-        if (opt == "1") {
+        cin >> opt; POR EL MOMENTO ESTO YA NO SERIA NECESARIO CON LA FUNCION MENU*/
+        if (opt == 1) {
             um.verReservas();
-        } else if (opt == "2") {
+        } else if (opt == 2) {
             um.mostrarTiposDeHabitaciones();
         }
-    } while (opt != "3");
+    } while (opt != 3);
 }
 
+void menuingresopersonal(){
+    UserManager um;
+    system("cls");
+    cuadro(0, 0, 80, 24);
+    cuadro(1, 1, 77, 3);
+    gotoxy(30, 2); cout << "Inicio de sesion de personal";
+    string username, password;
+    cout << "\n\n\n\n\t\t\t\tUsername: ";
+    cin >> username;
+    cout << "\n\t\t\t\tPassword: ";
+    cin >> password;
+    if (um.iniciarSesionPer(username, password)) {
+        menu_personal();
+    } else {
+        cout << "\n\n\n\n\t\t\t\tCredenciales incorrectas." << endl;
+        cout << "\t\t\tPulse enter para regresar...";
+        cin.ignore();
+        cin.get();
+    }    
+}
 void menuprincipal() {
-    string opt;
+    bool repite=true;
+    int opt;
+    system("COLOR B0");
+    const char *titulo = "Hotel Management System"; //Aqui ya no sera necesario poner uno por uno las funciones
+	const char *opciones[] = {"Cliente", "Personal","Salir"};//Tan solo agregas la opcion nueva aqui
+    int m=3;//y agregas +1 cuando agregues una funcion
     do {
-        system("cls");
+        opt=menu(titulo, opciones ,m);
+        /*system("cls");
         cuadro(0, 0, 80, 24);
         cuadro(1, 1, 77, 3);
-        gotoxy(30, 1); cout << "Hotel Management System";
+        gotoxy(30, 2); cout << "Hotel Management System";
         gotoxy(2, 4); cout << "1) Cliente" << endl;
         gotoxy(2, 5); cout << "2) Personal" << endl;
         gotoxy(2, 6); cout << "3) Salir" << endl;
         gotoxy(2, 8); cout << "Opcion: ";
-        cin >> opt;
-        if (opt == "1") {
-            menu_cliente();
-        } else if (opt == "2") {
-            UserManager um;
-            system("cls");
-            cuadro(0, 0, 80, 24);
-            gotoxy(30, 1); cout << "Inicio de sesion de personal";
-            string username, password;
-            cout << "\n\n\n\n\t\t\t\tUsername: ";
-            cin >> username;
-            cout << "\n\t\t\t\tPassword: ";
-            cin >> password;
-            if (um.iniciarSesionPer(username, password)) {
-                menu_personal();
-            } else {
-                cout << "\n\n\n\n\t\t\t\tCredenciales incorrectas." << endl;
-                cout << "\t\t\tPulse enter para regresar...";
-                cin.ignore();
-                cin.get();
-            }
+        cin >> opt;*/
+
+        switch(opt){
+            case 1:
+                menu_cliente();
+                break;
+            case 2:
+                menuingresopersonal();//ingresopersonal originalmente estaba todas sus funciones en el case 2,pero
+                //solia darme a cada rato errores,asi que la solucion que encontre era asignarle su propia funcion
+                break;
+            case 3:
+                repite = false;
+                break;
         }
-    } while (opt != "3");
+
+}while(repite);
 }
 
-void gotoxy(int x, int y) {
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+void gotoxy(int x,int y){
+	HANDLE hCon;
+	hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD dwPos;
+	dwPos.X=x;
+	dwPos.Y=y;
+	SetConsoleCursorPosition(hCon,dwPos);
 }
 
 void cuadro(int x1, int y1, int x2, int y2) {
@@ -623,4 +720,54 @@ void cuadro(int x1, int y1, int x2, int y2) {
 int main() {
     menuprincipal();
     return 0;
+}
+
+//FUNCION DESTINADA A REALIZAR EL TITULO Y SUS OPCIONES,YA NO SERA NECESARIO PONERLE UNO APOR UNO
+int menu(const char *titulo,const char *opciones[], int m)
+{
+	int opcionSeleccionada = 1;
+	int tecla;
+	bool repite = true;
+	
+	do{
+		system("cls");
+		cuadro(0, 0, 80, 24);
+        cuadro(1, 1, 77, 3);
+		gotoxy(5,3 + opcionSeleccionada);cout<< "==>";
+		//imprime el titulo
+		gotoxy(15,2);cout <<titulo;
+		
+		for(int i=0;i<m;i++){
+			gotoxy(10,4+i);cout<<i + 1 << ") " << opciones[i];
+		}
+		
+		do{
+			tecla=getch();
+		}while(tecla!=TECLA_ARRIBA && tecla != TECLA_ABAJO && tecla != ENTER);
+		
+		switch(tecla){
+			case TECLA_ARRIBA:
+				opcionSeleccionada--;
+				
+				if(opcionSeleccionada == 0){
+					opcionSeleccionada =m;
+				}
+				break;
+			case TECLA_ABAJO:
+				opcionSeleccionada++;
+				if(opcionSeleccionada> m){
+					opcionSeleccionada = 1;
+				}
+				break;
+			
+			case ENTER:
+				repite = false;
+				break;
+		}
+		
+	} while(repite);
+	
+	
+	
+	return opcionSeleccionada;
 }
